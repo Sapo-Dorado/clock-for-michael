@@ -3,7 +3,7 @@
 
   function updateClock() {
     const now = new Date();
-    now.setMinutes(now.getMinutes() - 5);
+    now.setMinutes(now.getMinutes() + 5);
     clockEl.textContent = now.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',

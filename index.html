@@ -44,7 +44,6 @@
         env(safe-area-inset-right, 0)
         env(safe-area-inset-bottom, 0)
         env(safe-area-inset-left, 0);
-      transition: background 0.3s ease;
     }
     body.cereal {
       background: var(--bg-cereal);
@@ -57,7 +56,6 @@
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
       text-align: center;
-      transition: opacity 0.3s ease;
     }
 
     #message {
@@ -66,18 +64,17 @@
       font-weight: 600;
       text-align: center;
       padding: 0 24px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      display: none;
       position: absolute;
-      pointer-events: none;
     }
 
     body.cereal #clock {
-      opacity: 0;
+      display: none;
     }
     body.cereal #message {
-      opacity: 1;
+      display: block;
     }
+
   </style>
 </head>
 <body>

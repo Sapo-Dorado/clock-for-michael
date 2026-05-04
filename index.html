@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Clock for Michael" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <title>Clock for Michael</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg-cereal: #000000;
+      --ink: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+      color: var(--ink);
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      height: 100dvh;
+      cursor: pointer;
+      padding:
+        env(safe-area-inset-top, 0)
+        env(safe-area-inset-right, 0)
+        env(safe-area-inset-bottom, 0)
+        env(safe-area-inset-left, 0);
+      transition: background 0.3s ease;
+    }
+    body.cereal {
+      background: var(--bg-cereal);
+    }
+
+    #clock {
+      font-size: clamp(80px, 20vw, 260px);
+      line-height: 1;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      transition: opacity 0.3s ease;
+    }
+
+    #message {
+      font-size: clamp(28px, 6vw, 72px);
+      line-height: 1.3;
+      font-weight: 600;
+      text-align: center;
+      padding: 0 24px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    body.cereal #clock {
+      opacity: 0;
+    }
+    body.cereal #message {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="clock"></div>
+  <div id="message">No time for a bowl of cereal!!</div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

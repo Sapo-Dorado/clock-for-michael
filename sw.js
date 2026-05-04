@@ -1,4 +1,4 @@
-const VERSION = 'v1';
+const VERSION = 'v2';
 const RUNTIME = `runtime-${VERSION}`;
 const STATIC = `static-${VERSION}`;
 const STATIC_ASSETS = ['./icon-180.png', './icon-192.png', './icon-512.png'];

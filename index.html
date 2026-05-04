@@ -75,11 +75,136 @@
       display: block;
     }
 
+    /* Countdown page */
+    #countdown-page {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      z-index: 10;
+    }
+    #countdown-page.active {
+      display: flex;
+    }
+
+    #countdown-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    #countdown-form label {
+      font-size: clamp(16px, 3vw, 24px);
+      font-weight: 400;
+      opacity: 0.7;
+    }
+    #countdown-form input[type="datetime-local"] {
+      font-family: inherit;
+      font-size: clamp(18px, 4vw, 28px);
+      padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: var(--ink);
+      outline: none;
+      color-scheme: dark;
+    }
+    #countdown-form button {
+      font-family: inherit;
+      font-size: clamp(16px, 3vw, 22px);
+      padding: 8px 24px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.15);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    #countdown-form button:active {
+      background: rgba(255,255,255,0.25);
+    }
+
+    #countdown-display {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    #countdown-display.active {
+      display: flex;
+    }
+    #countdown-display .time {
+      font-size: clamp(48px, 14vw, 180px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      line-height: 1;
+    }
+    #countdown-display .label {
+      font-size: clamp(14px, 2.5vw, 20px);
+      opacity: 0.5;
+      font-weight: 400;
+    }
+    #countdown-display .past {
+      font-size: clamp(24px, 5vw, 48px);
+      font-weight: 600;
+    }
+
+    .nav-btn {
+      position: absolute;
+      bottom: 24px;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      font-family: inherit;
+      font-size: 14px;
+      padding: 6px 14px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--ink);
+      opacity: 0.4;
+      cursor: pointer;
+      z-index: 20;
+    }
+    .nav-btn:active {
+      opacity: 0.7;
+    }
+    #to-countdown {
+      right: 24px;
+      right: calc(24px + env(safe-area-inset-right, 0px));
+    }
+    #to-clock {
+      left: 24px;
+      left: calc(24px + env(safe-area-inset-left, 0px));
+    }
+    #reset-countdown {
+      right: 24px;
+      right: calc(24px + env(safe-area-inset-right, 0px));
+    }
+
   </style>
 </head>
 <body>
   <div id="clock"></div>
   <div id="message">No time for a bowl of cereal!!</div>
+  <button id="to-countdown" class="nav-btn">countdown</button>
+
+  <div id="countdown-page">
+    <div id="countdown-form">
+      <label>Event date &amp; time</label>
+      <input type="datetime-local" id="event-input" />
+      <button type="button" id="set-event">Start countdown</button>
+    </div>
+    <div id="countdown-display">
+      <div class="time" id="countdown-time"></div>
+      <div class="label" id="countdown-label"></div>
+    </div>
+    <button id="to-clock" class="nav-btn">back</button>
+    <button id="reset-countdown" class="nav-btn" style="display:none;">reset</button>
+  </div>
 
   <script>
     if ('serviceWorker' in navigator) {

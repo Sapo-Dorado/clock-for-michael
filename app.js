@@ -1,4 +1,36 @@
 (() => {
+  // ── Tabs ──
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const indicator = document.querySelector('.tab-indicator');
+
+  function positionIndicator(tab) {
+    indicator.style.left = tab.offsetLeft + 'px';
+    indicator.style.width = tab.offsetWidth + 'px';
+  }
+
+  function switchTab(name) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.id === name + '-panel'));
+    const active = document.querySelector('.tab.active');
+    if (active) positionIndicator(active);
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+
+  // Position indicator on load
+  requestAnimationFrame(() => {
+    const active = document.querySelector('.tab.active');
+    if (active) positionIndicator(active);
+  });
+  window.addEventListener('resize', () => {
+    const active = document.querySelector('.tab.active');
+    if (active) positionIndicator(active);
+  });
+
+  // ── Clock ──
   const clockEl = document.getElementById('clock');
 
   function updateClock() {
@@ -14,23 +46,13 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Click to toggle cereal (but not on nav buttons)
-  document.body.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-btn') ||
-        e.target.closest('#countdown-page')) return;
-    document.body.classList.toggle('cereal');
-  });
-
-  // Countdown page
-  const countdownPage = document.getElementById('countdown-page');
+  // ── Countdown ──
   const countdownForm = document.getElementById('countdown-form');
   const countdownDisplay = document.getElementById('countdown-display');
   const countdownTime = document.getElementById('countdown-time');
   const countdownLabel = document.getElementById('countdown-label');
   const eventInput = document.getElementById('event-input');
   const setEventBtn = document.getElementById('set-event');
-  const toCountdownBtn = document.getElementById('to-countdown');
-  const toClockBtn = document.getElementById('to-clock');
   const resetBtn = document.getElementById('reset-countdown');
 
   let targetTime = null;
@@ -43,38 +65,14 @@
     const data = JSON.parse(saved);
     targetTime = data.target;
     randomOffsetMs = data.offset;
+    showCountdown();
   }
 
-  toCountdownBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    countdownPage.classList.add('active');
-    if (targetTime) {
-      showCountdown();
-    }
-  });
-
-  toClockBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    countdownPage.classList.remove('active');
-  });
-
-  resetBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    clearInterval(countdownInterval);
-    targetTime = null;
-    randomOffsetMs = 0;
-    localStorage.removeItem('countdown-event');
-    countdownDisplay.classList.remove('active');
-    countdownForm.style.display = '';
-    resetBtn.style.display = 'none';
-  });
-
-  setEventBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  setEventBtn.addEventListener('click', () => {
     const val = eventInput.value;
     if (!val) return;
     targetTime = new Date(val).getTime();
-    randomOffsetMs = Math.random() * 5 * 60 * 1000; // 0 to 5 minutes in ms
+    randomOffsetMs = Math.random() * 5 * 60 * 1000;
     localStorage.setItem('countdown-event', JSON.stringify({
       target: targetTime,
       offset: randomOffsetMs
@@ -82,10 +80,20 @@
     showCountdown();
   });
 
+  resetBtn.addEventListener('click', () => {
+    clearInterval(countdownInterval);
+    targetTime = null;
+    randomOffsetMs = 0;
+    localStorage.removeItem('countdown-event');
+    countdownDisplay.classList.remove('active');
+    resetBtn.classList.remove('active');
+    countdownForm.style.display = '';
+  });
+
   function showCountdown() {
     countdownForm.style.display = 'none';
     countdownDisplay.classList.add('active');
-    resetBtn.style.display = '';
+    resetBtn.classList.add('active');
     updateCountdown();
     clearInterval(countdownInterval);
     countdownInterval = setInterval(updateCountdown, 1000);

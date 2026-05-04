@@ -6,16 +6,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Clock for Michael" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#1a1a2e" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
   <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <title>Clock for Michael</title>
   <style>
     :root {
       --bg: #1a1a2e;
-      --bg-cereal: #000000;
       --ink: #ffffff;
+      --ink-dim: rgba(255,255,255,0.35);
+      --ink-hover: rgba(255,255,255,0.6);
+      --accent: rgba(255,255,255,0.9);
+      --surface: rgba(255,255,255,0.06);
+      --surface-hover: rgba(255,255,255,0.12);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -29,26 +36,83 @@
       -webkit-touch-callout: none;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior: none;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       color: var(--ink);
     }
     body {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       height: 100vh;
       height: 100dvh;
-      cursor: pointer;
       padding:
         env(safe-area-inset-top, 0)
         env(safe-area-inset-right, 0)
         env(safe-area-inset-bottom, 0)
         env(safe-area-inset-left, 0);
     }
-    body.cereal {
-      background: var(--bg-cereal);
+
+    /* ── Tab bar ── */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 20px 0 0;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .tab {
+      background: none;
+      border: none;
+      color: var(--ink-dim);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+    .tab:hover {
+      color: var(--ink-hover);
+    }
+    .tab.active {
+      color: var(--accent);
+    }
+    .tab-indicator {
+      position: absolute;
+      bottom: 0;
+      height: 1.5px;
+      background: var(--accent);
+      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
     }
 
+    /* ── Panels ── */
+    .panels {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .panel.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Clock ── */
     #clock {
       font-size: clamp(80px, 20vw, 260px);
       line-height: 1;
@@ -58,70 +122,55 @@
       text-align: center;
     }
 
-    #message {
-      font-size: clamp(28px, 6vw, 72px);
-      line-height: 1.3;
-      font-weight: 600;
-      text-align: center;
-      padding: 0 24px;
-      display: none;
-      position: absolute;
-    }
-
-    body.cereal #clock {
-      display: none;
-    }
-    body.cereal #message {
-      display: block;
-    }
-
-    /* Countdown page */
-    #countdown-page {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: var(--bg);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    /* ── Countdown ── */
+    #countdown-panel {
       gap: 32px;
-      z-index: 10;
-    }
-    #countdown-page.active {
-      display: flex;
     }
 
     #countdown-form {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
     #countdown-form label {
-      font-size: clamp(16px, 3vw, 24px);
+      font-size: clamp(14px, 2.5vw, 18px);
       font-weight: 400;
-      opacity: 0.7;
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
     }
     #countdown-form input[type="datetime-local"] {
       font-family: inherit;
-      font-size: clamp(18px, 4vw, 28px);
-      padding: 8px 16px;
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 8px;
-      background: rgba(255,255,255,0.1);
+      font-size: clamp(18px, 4vw, 26px);
+      font-weight: 300;
+      padding: 10px 18px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: var(--surface);
       color: var(--ink);
       outline: none;
       color-scheme: dark;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    #countdown-form input[type="datetime-local"]:focus {
+      border-color: rgba(255,255,255,0.35);
+      background: var(--surface-hover);
     }
     #countdown-form button {
       font-family: inherit;
-      font-size: clamp(16px, 3vw, 22px);
-      padding: 8px 24px;
+      font-size: clamp(14px, 2.5vw, 18px);
+      font-weight: 500;
+      padding: 10px 28px;
       border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: var(--surface-hover);
       color: var(--ink);
       cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.2s ease;
+    }
+    #countdown-form button:hover {
+      background: rgba(255,255,255,0.18);
     }
     #countdown-form button:active {
       background: rgba(255,255,255,0.25);
@@ -131,7 +180,7 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
     #countdown-display.active {
       display: flex;
@@ -145,65 +194,65 @@
       line-height: 1;
     }
     #countdown-display .label {
-      font-size: clamp(14px, 2.5vw, 20px);
-      opacity: 0.5;
+      font-size: clamp(12px, 2vw, 16px);
+      color: var(--ink-dim);
       font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
-    #countdown-display .past {
-      font-size: clamp(24px, 5vw, 48px);
-      font-weight: 600;
+    #countdown-display .time.past {
+      font-size: clamp(28px, 6vw, 56px);
+      font-weight: 500;
     }
 
-    .nav-btn {
-      position: absolute;
-      bottom: 24px;
-      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-      font-family: inherit;
-      font-size: 14px;
-      padding: 6px 14px;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--ink);
-      opacity: 0.4;
-      cursor: pointer;
-      z-index: 20;
-    }
-    .nav-btn:active {
-      opacity: 0.7;
-    }
-    #to-countdown {
-      right: 24px;
-      right: calc(24px + env(safe-area-inset-right, 0px));
-    }
-    #to-clock {
-      left: 24px;
-      left: calc(24px + env(safe-area-inset-left, 0px));
-    }
     #reset-countdown {
-      right: 24px;
-      right: calc(24px + env(safe-area-inset-right, 0px));
+      margin-top: 8px;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: var(--ink-dim);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 7px 20px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      display: none;
     }
-
+    #reset-countdown.active {
+      display: block;
+    }
+    #reset-countdown:hover {
+      color: var(--ink-hover);
+      border-color: rgba(255,255,255,0.25);
+    }
   </style>
 </head>
 <body>
-  <div id="clock"></div>
-  <div id="message">No time for a bowl of cereal!!</div>
-  <button id="to-countdown" class="nav-btn">countdown</button>
+  <nav class="tabs">
+    <button class="tab active" data-tab="clock">Clock</button>
+    <button class="tab" data-tab="countdown">Countdown</button>
+    <div class="tab-indicator"></div>
+  </nav>
 
-  <div id="countdown-page">
-    <div id="countdown-form">
-      <label>Event date &amp; time</label>
-      <input type="datetime-local" id="event-input" />
-      <button type="button" id="set-event">Start countdown</button>
+  <div class="panels">
+    <div class="panel active" id="clock-panel">
+      <div id="clock"></div>
     </div>
-    <div id="countdown-display">
-      <div class="time" id="countdown-time"></div>
-      <div class="label" id="countdown-label"></div>
+
+    <div class="panel" id="countdown-panel">
+      <div id="countdown-form">
+        <label>Event date &amp; time</label>
+        <input type="datetime-local" id="event-input" />
+        <button type="button" id="set-event">Start countdown</button>
+      </div>
+      <div id="countdown-display">
+        <div class="time" id="countdown-time"></div>
+        <div class="label" id="countdown-label"></div>
+      </div>
+      <button id="reset-countdown">Reset</button>
     </div>
-    <button id="to-clock" class="nav-btn">back</button>
-    <button id="reset-countdown" class="nav-btn" style="display:none;">reset</button>
   </div>
 
   <script>
